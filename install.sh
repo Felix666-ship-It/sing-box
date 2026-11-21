@@ -449,10 +449,11 @@ main() {
     mkdir -p $is_conf_dir
 
     load core.sh
-    # create a config
-    add hy2
+    # 只生成基础 config.json，不默认创建任何节点
+    create config.json
     # wait for background tasks (e.g., OpenRC service start)
     wait
+    msg ok "安装完成，使用: $is_core add [协议] 添加节点"
     # remove tmp dir and exit.
     exit_and_del_tmpdir ok
 }

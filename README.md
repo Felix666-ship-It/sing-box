@@ -9,7 +9,7 @@
 - 节点信息同时输出 IPv4 与 IPv6 分享链接，覆盖 VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、Socks
 - 移除主菜单的群组入口，以及安装完成后的关注 / 文档 / 推广区块
 - 安装脚本与脚本自更新指向本仓库
-- 当前脚本版本：`v1.21`
+- 当前脚本版本：`v1.22`
 
 ## 支持环境
 
@@ -49,6 +49,8 @@ bash install.sh -l
 | `-h, --help` | 显示安装帮助 |
 
 安装完成后可直接使用 `sing-box` 或 `sb` 命令。
+
+安装只部署脚本、核心与基础 `config.json`，不会自动创建任何节点；使用 `sing-box add [协议]` 手动添加第一个节点。
 
 ## 快速开始
 
