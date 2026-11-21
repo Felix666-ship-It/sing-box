@@ -139,6 +139,19 @@ get_ip() {
     }
 }
 
+get_ip6() {
+    [[ $ip6 || $is_no_auto_tls || $is_gen || $is_dont_get_ip ]] && return
+    # 优先取真实出口 IPv6，失败再回退到本机全局地址
+    ip6=$(_wget -6 -T 3 -qO- https://one.one.one.one/cdn-cgi/trace 2>/dev/null | sed -n 's/^ip=//p')
+    if [[ ! $(grep ":" <<<"$ip6") ]]; then
+        ip6=""
+        if [[ $(type -P ip) ]]; then
+            ip6=$(ip -6 addr show scope global 2>/dev/null | awk '/inet6 /{print $2}' | cut -d/ -f1 | grep -v '^fe80' | head -n1)
+            [[ ! $(grep ":" <<<"$ip6") ]] && ip6=""
+        fi
+    fi
+}
+
 get_port() {
     is_count=0
     while :; do
@@ -1371,6 +1384,13 @@ info() {
     fi
     # is_color=$(shuf -i 41-45 -n1)
     is_color=44
+    is_url6=""
+    get_ip6
+    if [[ $ip6 && $ip6 != "$ip" ]]; then
+        is_addr6="[$ip6]"
+    else
+        is_addr6=""
+    fi
     case $net in
     ws | tcp | h2 | quic | http*)
         if [[ $host ]]; then
@@ -1380,6 +1400,10 @@ info() {
             [[ $is_protocol == 'vmess' ]] && {
                 is_vmess_url=$(jq -c '{v:2,ps:'\"233boy-$net-$host\"',add:'\"$is_addr\"',port:'\"$is_https_port\"',id:'\"$uuid\"',aid:"0",net:'\"$net\"',host:'\"$host\"',path:'\"$path\"',tls:'\"tls\"'}' <<<{})
                 is_url=vmess://$(echo -n $is_vmess_url | base64 -w 0)
+                if [[ $is_addr6 ]]; then
+                    is_vmess_url6=$(jq -c '{v:2,ps:'\"233boy-$net-$host-v6\"',add:'\"$is_addr6\"',port:'\"$is_https_port\"',id:'\"$uuid\"',aid:"0",net:'\"$net\"',host:'\"$host\"',path:'\"$path\"',tls:'\"tls\"'}' <<<{})
+                    is_url6=vmess://$(echo -n $is_vmess_url6 | base64 -w 0)
+                fi
             } || {
                 [[ $is_protocol == "trojan" ]] && {
                     uuid=$password
@@ -1411,6 +1435,10 @@ info() {
             }
             is_vmess_url=$(jq -c "{v:2,ps:\"233boy-${net}-$is_addr\",add:\"$is_addr\",port:\"$port\",id:\"$uuid\",aid:\"0\",net:\"$net\",type:\"$is_type\"$is_quic_add}" <<<{})
             is_url=vmess://$(echo -n $is_vmess_url | base64 -w 0)
+            if [[ $is_addr6 ]]; then
+                is_vmess_url6=$(jq -c "{v:2,ps:\"233boy-${net}-$is_addr6\",add:\"$is_addr6\",port:\"$port\",id:\"$uuid\",aid:\"0\",net:\"$net\",type:\"$is_type\"$is_quic_add}" <<<{})
+                is_url6=vmess://$(echo -n $is_vmess_url6 | base64 -w 0)
+            fi
         fi
         ;;
     ss)
@@ -1480,6 +1508,15 @@ info() {
         is_url="socks://$(echo -n ${is_socks_user}:${is_socks_pass} | base64 -w 0)@${is_addr}:${port}#233boy-$net-${is_addr}"
         ;;
     esac
+    if [[ ! $is_url6 && $is_addr6 && $is_url ]]; then
+        if [[ $host && $is_url == *"@$host:"* ]]; then
+            is_url6="${is_url/@$host:/@$is_addr6:}"
+        elif [[ $is_anytls_domain && $is_url == *"@$is_anytls_domain:"* ]]; then
+            is_url6="${is_url/@$is_anytls_domain:/@$is_addr6:}"
+        elif [[ $is_url == *"@$is_addr:"* ]]; then
+            is_url6="${is_url/@$is_addr:/@$is_addr6:}"
+        fi
+    fi
     [[ $is_dont_show_info || $is_gen || $is_dont_auto_exit ]] && return # dont show info
     msg "-------------- $is_config_name -------------"
     for ((i = 0; i < ${#is_info_show[@]}; i++)); do
@@ -1501,6 +1538,10 @@ info() {
             warn "某些客户端如(V2rayN 等)导入URL需手动将: 跳过证书验证(allowInsecure) 设置为 true, 或打开: 允许不安全的连接"
         }
     fi
+    if [[ $is_url6 ]]; then
+        msg "------------- ${info_list[12]} (IPv6) -------------"
+        msg "\e[4;${is_color}m${is_url6}\e[0m"
+    fi
     if [[ $is_no_auto_tls ]]; then
         msg "------------- no-auto-tls INFO -------------"
         msg "端口(port): $port"
@@ -1514,13 +1555,6 @@ info() {
 footer_msg() {
     [[ $is_core_stop && ! $is_new_json ]] && warn "$is_core_name 当前处于停止状态."
     [[ $is_caddy_stop && $host ]] && warn "Caddy 当前处于停止状态."
-    ####### 要点13脸吗只会改我链接的小人 #######
-    unset c n m s b
-    msg "------------- END -------------"
-    msg "关注(tg): $(msg_ul https://t.me/tg2333)"
-    msg "文档(doc): $(msg_ul https://233boy.com/$is_core/$is_core-script/)"
-    msg "推广(ads): 机场推荐($is_core_name services): $(msg_ul https://g${c}e${n}t${m}j${s}m${b}s.com/)\n"
-    ####### 要点13脸吗只会改我链接的小人 #######
 }
 
 # URL or qrcode
@@ -1608,7 +1642,6 @@ update() {
 is_main_menu() {
     msg "\n------------- $is_core_name script $is_sh_ver by $author -------------"
     msg "$is_core_name $is_core_ver: $is_core_status"
-    msg "群组(Chat): $(msg_ul https://t.me/tg233boy)"
     is_main_start=1
     ask mainmenu
     case $REPLY in
