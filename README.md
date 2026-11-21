@@ -1,115 +1,150 @@
-# 介绍
+# sing-box 一键安装 / 管理脚本
 
-最好用的 sing-box 一键安装脚本 & 管理脚本
+多配置并存的 sing-box 服务端部署与管理脚本，基于 `233boy/sing-box` 修改维护。
 
-# 特点
+本仓库为独立 fork，安装与更新均从本仓库获取，不依赖上游发布。
 
-- 快速安装
-- 无敌好用
-- 零学习成本
-- 自动化 TLS
-- 简化所有流程
-- 兼容 sing-box 命令
-- 强大的快捷参数
-- 支持所有常用协议
-- 一键添加 VLESS-REALITY (默认)
-- 一键添加 TUIC
-- 一键添加 Trojan
-- 一键添加 Hysteria2
-- 一键添加 AnyTLS
-- 一键添加 Shadowsocks 2022
-- 一键添加 VMess-(TCP/HTTP/QUIC)
-- 一键添加 VMess-(WS/H2/HTTPUpgrade)-TLS
-- 一键添加 VLESS-(WS/H2/HTTPUpgrade)-TLS
-- 一键添加 Trojan-(WS/H2/HTTPUpgrade)-TLS
-- 一键启用 BBR
-- 一键更改伪装网站
-- 一键更改 (端口/UUID/密码/域名/路径/加密方式/SNI/等...)
-- 还有更多...
+## 本 Fork 的改动
 
-# 设计理念
+- 节点信息同时输出 IPv4 与 IPv6 分享链接，覆盖 VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、Socks
+- 移除主菜单的群组入口，以及安装完成后的关注 / 文档 / 推广区块
+- 安装脚本与脚本自更新指向本仓库
+- 当前脚本版本：`v1.21`
 
-设计理念为：**高效率，超快速，极易用**
+## 支持环境
 
-脚本基于作者的自身使用需求，以 **多配置同时运行** 为核心设计
+- Root 权限
+- 64 位 Linux：Debian / Ubuntu / CentOS / SUSE / Alpine
+- systemd 或 OpenRC
+- 使用自动 TLS 的协议需要域名已解析到本机，且 80 / 443 可访问
 
-并且专门优化了，添加、更改、查看、删除、这四项常用功能
+## 安装
 
-你只需要一条命令即可完成 添加、更改、查看、删除、等操作
+在线安装：
 
-例如，添加一个配置仅需不到 1 秒！瞬间完成添加！其他操作亦是如此！
-
-脚本的参数非常高效率并且超级易用，请掌握参数的使用
-
-# 文档
-
-安装及使用：https://233boy.com/sing-box/sing-box-script/
-
-# 帮助
-
-使用：`sing-box help`
-
+```bash
+bash <(wget -qO- https://raw.githubusercontent.com/Felix666-ship-It/sing-box/main/install.sh)
 ```
-sing-box script v1.0 by 233boy
-Usage: sing-box [options]... [args]...
 
-基本:
-   v, version                                      显示当前版本
-   ip                                              返回当前主机的 IP
-   pbk                                             同等于 sing-box generate reality-keypair
-   get-port                                        返回一个可用的端口
-   ss2022                                          返回一个可用于 Shadowsocks 2022 的密码
-
-一般:
-   a, add [protocol] [args... | auto]              添加配置
-   c, change [name] [option] [args... | auto]      更改配置
-   d, del [name]                                   删除配置**
-   i, info [name]                                  查看配置
-   qr [name]                                       二维码信息
-   url [name]                                      URL 信息
-   log                                             查看日志
-更改:
-   full [name] [...]                               更改多个参数
-   id [name] [uuid | auto]                         更改 UUID
-   host [name] [domain]                            更改域名
-   port [name] [port | auto]                       更改端口
-   path [name] [path | auto]                       更改路径
-   passwd [name] [password | auto]                 更改密码
-   key [name] [Private key | auto] [Public key]    更改密钥
-   method [name] [method | auto]                   更改加密方式
-   sni [name] [ ip | domain]                       更改 serverName
-   new [name] [...]                                更改协议
-   web [name] [domain]                             更改伪装网站
-
-进阶:
-   dns [...]                                       设置 DNS
-   dd, ddel [name...]                              删除多个配置**
-   fix [name]                                      修复一个配置
-   fix-all                                         修复全部配置
-   fix-caddyfile                                   修复 Caddyfile
-   fix-config.json                                 修复 config.json
-   import                                          导入 sing-box/v2ray 脚本配置
-
-管理:
-   un, uninstall                                   卸载
-   u, update [core | sh | caddy] [ver]             更新
-   U, update.sh                                    更新脚本
-   s, status                                       运行状态
-   start, stop, restart [caddy]                    启动, 停止, 重启
-   t, test                                         测试运行
-   reinstall                                       重装脚本
-
-测试:
-   debug [name]                                    显示一些 debug 信息, 仅供参考
-   gen [...]                                       同等于 add, 但只显示 JSON 内容, 不创建文件, 测试使用
-   no-auto-tls [...]                               同等于 add, 但禁止自动配置 TLS, 可用于 *TLS 相关协议
-其他:
-   bbr                                             启用 BBR, 如果支持
-   bin [...]                                       运行 sing-box 命令, 例如: sing-box bin help
-   [...] [...]                                     兼容绝大多数的 sing-box 命令, 例如: sing-box generate uuid
-   h, help                                         显示此帮助界面
-
-谨慎使用 del, ddel, 此选项会直接删除配置; 无需确认
-反馈问题) https://github.com/233boy/sing-box/issues
-文档(doc) https://233boy.com/sing-box/sing-box-script/
+```bash
+bash <(curl -Ls https://raw.githubusercontent.com/Felix666-ship-It/sing-box/main/install.sh)
 ```
+
+本地安装：
+
+```bash
+git clone https://github.com/Felix666-ship-It/sing-box.git
+cd sing-box
+bash install.sh -l
+```
+
+安装参数：
+
+| 参数 | 说明 |
+| --- | --- |
+| `-f, --core-file <path>` | 使用本地 sing-box 核心压缩包 |
+| `-l, --local-install` | 使用当前目录的脚本源码安装 |
+| `-p, --proxy <addr>` | 下载时使用代理，如 `http://127.0.0.1:2333` |
+| `-v, --core-version <ver>` | 指定 sing-box 核心版本，如 `v1.12.0` |
+| `-h, --help` | 显示安装帮助 |
+
+安装完成后可直接使用 `sing-box` 或 `sb` 命令。
+
+## 快速开始
+
+```bash
+sing-box                     # 交互式菜单
+sing-box add reality         # VLESS-REALITY
+sing-box add hy2             # Hysteria2
+sing-box add trojan          # Trojan
+sing-box add tuic            # TUIC v5
+sing-box add anytls          # AnyTLS（需 sing-box >= 1.12）
+sing-box add ss              # Shadowsocks 2022
+sing-box add vws             # VLESS-WS-TLS
+sing-box add vh2             # VLESS-H2-TLS
+sing-box add vhu             # VLESS-HTTPUpgrade-TLS
+sing-box add ws              # VMess-WS
+sing-box add wss             # VMess-WS-TLS
+sing-box add h2              # VMess-H2-TLS
+sing-box add tws             # Trojan-WS-TLS
+sing-box add socks           # Socks5
+sing-box info                # 查看节点与分享链接
+```
+
+协议别名：
+
+| 协议 | `add` 参数 |
+| --- | --- |
+| VLESS-REALITY | `reality` / `r` |
+| VLESS-HTTP2-REALITY | `rh2` |
+| VLESS-WS / H2 / HTTPUpgrade + TLS | `vws` / `vh2` / `vhu` |
+| VMess-TCP / HTTP / QUIC | `tcp` / `http` / `quic` |
+| VMess-WS / H2 / HTTPUpgrade + TLS | `wss` / `h2` / `hu` |
+| Trojan / Trojan-WS / H2 / HTTPUpgrade + TLS | `trojan` / `tws` / `th2` / `thu` |
+| Hysteria2 | `hy2` / `hy` |
+| TUIC v5 | `tuic` |
+| AnyTLS | `anytls` |
+| Shadowsocks | `ss` |
+| Socks5 | `socks` |
+| 直接转发 | `direct` / `door` |
+
+## IPv4 / IPv6 双栈
+
+添加或查看节点时：
+
+1. 先输出 IPv4 分享链接。
+2. 检测到公网 IPv6 时，紧接着输出 `链接 (IPv6)` 区块。
+3. 纯 IPv4 机器只输出 IPv4 链接，行为与之前一致。
+
+IPv6 地址获取顺序：
+
+1. `wget -6 https://one.one.one.one/cdn-cgi/trace` 读取真实出口 IPv6。
+2. 失败时回退 `ip -6 addr show scope global`。
+
+服务端 inbound 默认 `listen: "::"`，同时监听 IPv4 与 IPv6；无需额外开启双栈。云厂商安全组或系统防火墙需放行对应端口，Hysteria2 / TUIC 为 UDP，其余为 TCP。
+
+## 常用命令
+
+| 命令 | 说明 |
+| --- | --- |
+| `sing-box add [协议]` | 添加配置 |
+| `sing-box change [名称] [项] [值]` | 修改配置 |
+| `sing-box del [名称]` | 删除配置（无二次确认） |
+| `sing-box info [名称]` | 查看配置与链接 |
+| `sing-box url [名称]` | 只显示分享链接 |
+| `sing-box qr [名称]` | 显示二维码 |
+| `sing-box log` | 查看日志 |
+| `sing-box status` | 查看运行状态 |
+| `sing-box start / stop / restart` | 管理服务 |
+| `sing-box test` | 测试运行 |
+| `sing-box update core` | 更新 sing-box 核心 |
+| `sing-box update.sh` | 更新脚本 |
+| `sing-box bbr` | 启用 BBR |
+| `sing-box dns` | 设置 DNS |
+| `sing-box import` | 导入 sing-box / v2ray 脚本配置 |
+| `sing-box uninstall` | 卸载 |
+| `sing-box help` | 查看完整帮助 |
+
+## 文件位置
+
+```text
+/etc/sing-box/bin/sing-box       sing-box 核心
+/etc/sing-box/conf/*.json        每个节点的配置
+/etc/sing-box/config.json        汇总配置
+/etc/sing-box/sh/                脚本源码
+/usr/local/bin/sing-box          脚本入口
+/usr/local/bin/sb                脚本入口（简写）
+/var/log/sing-box/               日志
+```
+
+服务名：`sing-box.service`；启用自动 TLS 时另有 `caddy.service`。
+
+## 更新与卸载
+
+```bash
+sing-box update core      # 更新核心
+sing-box update.sh        # 更新脚本（从本仓库 Release 获取）
+sing-box uninstall        # 卸载
+```
+
+`del` / `ddel` 会直接删除配置，没有确认步骤，执行前确认名称。

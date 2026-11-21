@@ -1,7 +1,7 @@
 #!/bin/bash
 
-author=233boy
-# github=https://github.com/233boy/sing-box
+author=Felix666-ship-It
+# github=https://github.com/Felix666-ship-It/sing-box
 
 # bash fonts colors
 red='\e[31m'
