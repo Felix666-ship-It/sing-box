@@ -42,6 +42,7 @@ mainmenu=(
     "更新"
     "卸载"
     "其他"
+    "更新脚本"
 )
 info_list=(
     "协议 (protocol)"
@@ -1711,6 +1712,9 @@ is_main_menu() {
             dns_set
             ;;
         esac
+        ;;
+    9)
+        update sh
         ;;
     esac
 }
