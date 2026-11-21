@@ -41,9 +41,7 @@ mainmenu=(
     "运行管理"
     "更新"
     "卸载"
-    "帮助"
     "其他"
-    "关于"
 )
 info_list=(
     "协议 (protocol)"
@@ -226,6 +224,14 @@ is_port_used() {
     msg "请执行: $(_yellow "${cmd} update -y; ${cmd} install net-tools -y") 来修复此问题."
 }
 
+# 返回上一步：重新进入主菜单
+_ask_back() {
+    msg "\n${is_green}返回上一步${none}"
+    local self="$0"
+    [[ -f "$self" ]] || self="$is_sh_dir/$is_core.sh"
+    exec bash "$self"
+}
+
 # ask input a string or pick a option for list.
 ask() {
     case $1 in
@@ -283,6 +289,18 @@ ask() {
     while :; do
         echo -ne $is_opt_input_msg
         read REPLY
+        # 00 退出脚本；0 返回上一步（主菜单）
+        [[ "$REPLY" == "00" ]] && {
+            msg "\n退出脚本"
+            exit 0
+        }
+        if [[ "$REPLY" == "0" ]]; then
+            if [[ $is_ask_set == 'is_main_pick' ]]; then
+                msg "\n已经位于主菜单"
+                continue
+            fi
+            _ask_back
+        fi
         [[ ! $REPLY && $is_emtpy_exit ]] && exit
         [[ ! $REPLY && $is_default_arg ]] && export $is_ask_set=$is_default_arg && break
         [[ "$REPLY" == "${is_str}2${is_get}3${is_opt}3" && $is_ask_set == 'is_main_pick' ]] && {
@@ -1672,11 +1690,6 @@ is_main_menu() {
         uninstall
         ;;
     8)
-        msg
-        load help.sh
-        show_help
-        ;;
-    9)
         ask list is_do_other "启用BBR 查看日志 测试运行 重装脚本 设置DNS"
         case $REPLY in
         1)
@@ -1698,10 +1711,6 @@ is_main_menu() {
             dns_set
             ;;
         esac
-        ;;
-    10)
-        load help.sh
-        about
         ;;
     esac
 }
